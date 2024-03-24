@@ -1,5 +1,4 @@
-The MIT License (MIT)
-
+/*
 Copyright © 2024 Nathanael Santoso, Gede Prasidha Bhawarnawa, Felicia Sutandijo <business@nathancs.dev, 13520004@std.stei.itb.ac.id, feliciasutandijo@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,3 +18,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+*/
+package utils
+
+import (
+	"encoding/hex"
+	"testing"
+)
+
+func TestInvertibleSBox(t *testing.T) {
+	sbox := GetSBox()
+	invsbox := GetInvSBox()
+	for i := range 256 {
+		if invsbox[sbox[byte(i)]] != byte(i) {
+			t.Error("Inversed SBox is not the inverse of SBox (miscalculated at", hex.EncodeToString([]byte{byte(i)}), ", got", hex.EncodeToString([]byte{invsbox[sbox[byte(i)]]}), "instead)")
+		}
+	}
+}
