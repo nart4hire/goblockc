@@ -62,3 +62,17 @@ func BytesToUInt64(b []byte) (uint64, error) {
 
 	return res, nil
 }
+
+func XORBytes(dst, src, key []byte) int {
+	n := min(len(src), len(key))
+
+	if n == 0 {
+		return 0
+	}
+
+	for i := range n {
+		dst[i] = src[i] ^ key[i]
+	}
+
+	return n
+}

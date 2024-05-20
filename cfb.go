@@ -24,9 +24,10 @@ package goblockc
 // Manual implementation of Cipher Block Chaining (CFB) as described in NIST SP 800-38A, pp 10-11
 
 import (
-	// "bytes"
 	"crypto/cipher"
 	"errors"
+
+	"github.com/nart4hire/goblockc/utils"
 )
 
 type cfb struct {
@@ -39,7 +40,7 @@ type cfb struct {
 
 func NewCFB(block cipher.Block, initVector []byte, mode Mode) (cipher.Stream, error) {
 	if len(initVector) != block.BlockSize() {
-		return nil, errors.New("cfb: NewCFB: IV length must equal block size")
+		return nil, errors.New("IV length must equal block size")
 	}
 
 	stream := &cfb{
@@ -57,7 +58,7 @@ func NewCFB(block cipher.Block, initVector []byte, mode Mode) (cipher.Stream, er
 
 func (c *cfb) XORKeyStream(dst, src []byte) {
 	if len(dst) < len(src) {
-		panic("crypto/cipher: output buffer smaller than input")
+		panic("Output buffer smaller than input")
 	}
 
 	result := make([]byte, len(dst))
@@ -73,7 +74,7 @@ func (c *cfb) XORKeyStream(dst, src []byte) {
 			copy(c.next[c.used:], src)
 		}
 
-		n := XORBytes(result[accum:], src, c.out[c.used:])
+		n := utils.XORBytes(result[accum:], src, c.out[c.used:])
 
 		if c.mode == Encrypt {
 			copy(c.next[c.used:], result[accum:])
@@ -85,18 +86,4 @@ func (c *cfb) XORKeyStream(dst, src []byte) {
 	}
 
 	copy(dst, result)
-}
-
-func XORBytes(dst, src, key []byte) int {
-	n := min(len(src), len(key))
-
-	if n == 0 {
-		return 0
-	}
-
-	for i := range n {
-		dst[i] = src[i] ^ key[i]
-	}
-
-	return n
 }

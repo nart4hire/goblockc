@@ -28,7 +28,7 @@ import (
 	. "github.com/nart4hire/goblockc"
 )
 
-func TestCBC(t *testing.T) {
+func TestCFB(t *testing.T) {
 	plaintext := []byte("abcdefghijklmnopqrstuvwxyz0123456789")
 	t.Log(hex.EncodeToString(plaintext))
 	key := []byte("abcdefghijklmnop")
