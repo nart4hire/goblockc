@@ -19,30 +19,38 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package goblockc
+package goblockc_test
 
 import (
 	"encoding/hex"
 	"testing"
+
+	. "github.com/nart4hire/goblockc"
 )
 
-func TestParse(t *testing.T) {
-	plaintext := []byte("abcdefghijklmnopqrstuvwxyz")
-	key := []byte("abcdefghijklmnopqrstuvwxyz")
+func TestEncryptDecrypt(t *testing.T) {
+	plaintext := []byte("abcdefghijklmnop")
+	t.Log(hex.EncodeToString(plaintext))
+	key := []byte("abcdefghijklmnop")
+	t.Log(hex.EncodeToString(key))
 
-	ciphertext, err := parse(plaintext[:16], key[:16], true)
-
-	if err != nil {
-		t.Error("Unexpected error")
-	}
-
-	decrypted, err := parse(ciphertext, key[:16], false)
+	gbc, err := NewBlock(key)
 
 	if err != nil {
 		t.Error("Unexpected error")
 	}
 
-	if hex.EncodeToString(plaintext[:16]) != hex.EncodeToString(decrypted) {
+	ciphertext := make([]byte, 16)
+	copy(ciphertext, plaintext)
+	gbc.Encrypt(ciphertext, ciphertext)
+	t.Log(hex.EncodeToString(ciphertext))
+
+	decrypted := make([]byte, 16)
+	copy(decrypted, ciphertext)
+	gbc.Decrypt(decrypted, decrypted)
+	t.Log(hex.EncodeToString(decrypted))
+
+	if hex.EncodeToString(plaintext) != hex.EncodeToString(decrypted) {
 		t.Error("Decrypted text is not equal to original text")
 		t.Log(hex.EncodeToString(plaintext[:16]), hex.EncodeToString(decrypted))
 	}

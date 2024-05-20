@@ -19,20 +19,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package utils_test
+package goblockc
 
 import (
-	"encoding/hex"
+	"reflect"
 	"testing"
-	. "github.com/nart4hire/goblockc/utils"
 )
 
-func TestInvertibleSBox(t *testing.T) {
-	sbox := GetSBox()
-	invsbox := GetInvSBox()
-	for i := range 256 {
-		if invsbox[sbox[byte(i)]] != byte(i) {
-			t.Error("Inversed SBox is not the inverse of SBox (miscalculated at", hex.EncodeToString([]byte{byte(i)}), ", got", hex.EncodeToString([]byte{invsbox[sbox[byte(i)]]}), "instead)")
-		}
+func TestKeyScheduleBuffer(t *testing.T) {
+	ciphertext := []byte("abcdefghijklmnop")
+	key := []byte("abcdefghijklmnop")
+	gbc, err := NewBlock(key)
+
+	GBC, ok := gbc.(*GoBlockC)
+	if !ok {
+		t.Error("Failed to cast to GoBlockC")
+	}
+	keySchedule1 := make([][]byte, 16)
+	copy(keySchedule1, GBC.keySchedule)
+
+
+	plaintext := make([]byte, 16)
+	copy(plaintext, ciphertext)
+	gbc.Decrypt(plaintext, plaintext)
+
+	if err != nil {
+		t.Error("Unexpected error")
+	}
+
+	GBC, ok = gbc.(*GoBlockC)
+	if !ok {
+		t.Error("Failed to cast to GoBlockC")
+	}
+	keySchedule2 := make([][]byte, 16)
+	copy(keySchedule2, GBC.keySchedule)
+
+	t.Log(keySchedule1)
+	t.Log(keySchedule2)
+
+	if !reflect.DeepEqual(keySchedule1, keySchedule2) {
+		t.Error("Key schedule buffer is not equal")
 	}
 }
